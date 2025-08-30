@@ -356,8 +356,13 @@ function Transmog_Load(player)
 		
 		-- Применяем трансмогрификацию к персонажу
 		if (item ~= nil and item ~= '' and item ~= 0) then
+			-- Обычный трансмог - применяем item
 			player:SetUInt32Value(tonumber(slot), item)
+		elseif (item == 0) then
+			-- Скрытый слот - устанавливаем визуал в 0
+			player:SetUInt32Value(tonumber(slot), 0)
 		elseif (real_item ~= nil and real_item ~= '' and real_item ~= 0) then
+			-- Если нет трансмога, но есть real_item - показываем оригинальный предмет
 			player:SetUInt32Value(tonumber(slot), real_item)
 		else
 			-- Если нет трансмогрификации, устанавливаем значение слота в 0
@@ -503,8 +508,13 @@ function TransmogrificationHandler.SetTransmogItemIDs(player)
 		
 		-- Применяем трансмогрификацию к персонажу на сервере
 		if item and item ~= 0 then
+			-- Обычный трансмог - применяем item
 			player:SetUInt32Value(tonumber(slot), item)
+		elseif item == 0 then
+			-- Скрытый слот - устанавливаем визуал в 0
+			player:SetUInt32Value(tonumber(slot), 0)
 		elseif real_item and real_item ~= 0 then
+			-- Если нет трансмога, но есть real_item - показываем оригинальный предмет
 			player:SetUInt32Value(tonumber(slot), real_item)
 		else
 			-- Если нет трансмогрификации, устанавливаем значение слота в 0
@@ -512,7 +522,10 @@ function TransmogrificationHandler.SetTransmogItemIDs(player)
 		end
 		
 		-- Отправляем данные клиенту для синхронизации интерфейса
-		if (not item or item == 0 and real_item ~= nil and real_item ~= 0) then
+		if item == 0 then
+			-- Скрытый слот - отправляем 0
+			AIO.Handle(player, "TransmogrificationServer", "SetTransmogItemIDClient", slot, 0, real_item)
+		elseif (not item or item == 0 and real_item ~= nil and real_item ~= 0) then
 			AIO.Handle(player, "TransmogrificationServer", "SetTransmogItemIDClient", slot, 0, real_item)
 		else
 			AIO.Handle(player, "TransmogrificationServer", "SetTransmogItemIDClient", slot, item, real_item)
